@@ -38,6 +38,7 @@ require 'openid/extensions/sreg'
 require '/var/www/siffd/hostip'
 require '/var/www/siffd/forty_three_places'
 require '/var/www/siffd/upcoming'
+require '/var/www/siffd/location'
 
 Camping.goes :Siffd
 
@@ -221,6 +222,44 @@ module Siffd::Controllers
         end
       end
 
+      @near = nil
+
+      @woeids = Location.search(@search)
+      @is_woeid = @woeids.length > 0
+
+      @metros = Upcoming.metro_search(@search)
+      @is_metro = @metros.length > 0
+
+      @events = Upcoming.text_search(@search)
+      @is_event = @events.length > 0
+
+      @search_strategy = "unknown"
+
+      if @is_event and not @is_metro then
+        @search_strategy = "just search events for this text"
+      elsif @is_woeid and not @is_event then
+        if @woeids.length == 1 then
+          @near = @woeids[0].elements["name"].text + ", " + @woeids[0].elements["admin1"].text + " " + @woeids[0].elements["country"].text
+          @search = ""
+        end
+        @search_strategy = "search for events near this place, using lat,long"
+      elsif @is_woeid and @is_event and @is_metro then
+        if @woeids.length == 1 then
+          @near = @woeids[0].elements["name"].text + ", " + @woeids[0].elements["admin1"].text + " " + @woeids[0].elements["country"].text
+          @search = ""
+        end
+        @search_strategy = "search for everything near this place, using lat,long"
+      elsif 
+        @search_strategy = @is_woeid.inspect + @is_metro.inspect + @is_event.inspect
+      end
+
+
+      #if search is a metro?
+      ##does search have woeid?
+      #
+      #lat,long
+      
+
       render :index
     end
   end
@@ -283,14 +322,6 @@ module Siffd::Views
               }
             }
           }
-          div.header! {
-            h1 {
-              a(:href => R(Index)) {
-                "Siffd"
-              }
-              text(" your daily colandar of events")
-            }
-          }
           div {
             self << yield
           }
@@ -330,6 +361,34 @@ module Siffd::Views
       }
       div.search! {
         input(:name => :search, :value => @search)
+        text(" near ") if @near
+        input(:name => :near, :value => @near) if @near
+      }
+      div.results! {
+        p {
+          @search_strategy
+        }
+        ul {
+          @metros.each { |metro|
+            li {
+              metro.attributes["name"]
+            }
+          }
+        }
+        ul {
+          @woeids.each { |woeid|
+            li {
+              woeid.elements["name"].text
+            }
+          }
+        }
+        ul {
+          @events.each { |event|
+            li {
+              event.attributes["name"]
+            }
+          }
+        }
       }
     }
   end
@@ -362,6 +421,8 @@ end
 
 #FortyThreePlaces.latest
 #puts Upcoming.popular.inspect
+#require '/var/www/siffd/boot'
+#puts Upcoming.metro_search("Caesars Head State Park").inspect
 
 =begin
 []   range specificication (e.g., [a-z] means a letter in the range a to z)
