@@ -283,6 +283,14 @@ module Siffd::Views
               }
             }
           }
+          div.header! {
+            h1 {
+              a(:href => R(Index)) {
+                "Siffd"
+              }
+              text(" your daily colandar of events")
+            }
+          }
           div {
             self << yield
           }
