@@ -19,4 +19,8 @@ class Upcoming
     }
   end
 
+  def self.metro_search (search)
+    
+  end
+
 end

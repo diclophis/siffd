@@ -236,7 +236,7 @@ end
 
 module Siffd::Views
   def layout
-    html {
+    xhtml_transitional {
       head {
         title {
           "Siffd - Your Daily Colandar of Events"
@@ -257,7 +257,7 @@ module Siffd::Views
         form(:action => R(Index)) {
           ul.dates! {
             li {
-              img.calendar!(:src => "/images/calendar.png")
+              img.calendar!(:src => "/images/calendar.png", :alt => "select date")
             }
             li {
               input.date!(:name => :date, :value => @date)
