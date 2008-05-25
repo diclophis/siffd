@@ -2,6 +2,8 @@
 
 class Upcoming
 
+  BASE_URL = "http://upcoming.yahooapis.com/services/rest/"
+
   def self.popular
     events = []
     cities = []

@@ -14,6 +14,7 @@ Camping::Models::Base.establish_connection(
   :socket => "/var/run/mysqld/mysqld.sock"
 )
 
+
 Siffd::Models.create_schema
 
 #Camping::Models::Base.observers = Dixie::Models::CacheObserver 
