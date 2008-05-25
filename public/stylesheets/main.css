@@ -1,0 +1,87 @@
+/* WangChung */
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  border: 0px;
+}
+
+#identity_url {
+  background: url( /images/openid.gif ) no-repeat;
+  background-position: 0 50%;
+  background-color: #fff;
+  padding-left: 18px;
+  margin: 0.5em;
+}
+
+ul {
+  margin: 0;
+  padding: 0.25em;
+  list-style: none;
+}
+
+li {
+  margin: 0 0.25em 0.25em 0;
+}
+
+#date {
+  border: 0px;
+  margin: 0.25em 0 0 0;
+  width: 5em;
+}
+
+#dates {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#dates li {
+  display: inline;
+  float: left;
+}
+
+#popular_cities {
+  position: absolute;
+  top: 4em;
+  left: 4%;
+  width: 25%;
+  height: 10em;
+  overflow: auto;
+}
+
+#popular_events {
+  position: absolute;
+  top: 4em;
+  left: 37%;
+  width: 25%;
+  height: 10em;
+  overflow: auto;
+}
+
+#new_places {
+  position: absolute;
+  top: 4em;
+  left: 70%;
+  width: 25%;
+  height: 10em;
+  overflow: auto;
+}
+
+#search {
+  position: absolute;
+  top: 18em;
+  width: 100%;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+#search input {
+  width: 33%;
+  font-size: larger;
+  padding: 0.25em;
+}
