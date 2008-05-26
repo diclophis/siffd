@@ -5,46 +5,59 @@ body {
   padding: 0;
 }
 
-div {
-}
-
 img {
   border: 0px;
 }
 
-#identity_url {
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+a, p, li {
+  margin: 0;
+  padding: 0;
+}
+
+#login {
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+}
+
+#login li {
+  display: inline;
+  margin: 0 0.25em 0 0;
+}
+
+input#identity_url {
   background: url( /images/openid.gif ) no-repeat;
   background-position: 0 50%;
   background-color: #fff;
   padding-left: 18px;
-  margin: 0.5em;
-}
-
-ul {
-  margin: 0;
-  padding: 0.25em;
-  list-style: none;
-}
-
-li {
-  margin: 0 0.25em 0.25em 0;
-}
-
-#date {
-  border: 0px;
-  margin: 0.25em 0 0 0;
-  width: 5em;
 }
 
 #dates {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 0.5em;
+  right: 0.5em;
 }
 
 #dates li {
   display: inline;
-  float: left;
+  margin: 0 0.25em 0 0;
+}
+
+input#when {
+  border: 0px;
+  width: 6em;
+}
+
+#dates img {
+  margin: 0 0 5px 0;
+  padding: 0;
+  vertical-align: middle;
 }
 
 #popular_cities {
@@ -53,7 +66,7 @@ li {
   left: 4%;
   width: 25%;
   height: 10em;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #popular_events {
@@ -62,7 +75,7 @@ li {
   left: 37%;
   width: 25%;
   height: 10em;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #new_places {
@@ -71,7 +84,7 @@ li {
   left: 70%;
   width: 25%;
   height: 10em;
-  overflow: auto;
+  overflow: hidden;
 }
 
 #search {
@@ -84,7 +97,7 @@ li {
   font-size: large;
 }
 
-#search input {
+#search input[type=text] {
   width: 20%;
   padding: 0.25em;
   font-size: large;
@@ -93,5 +106,5 @@ li {
 #results {
   position: absolute;
   top: 20em;
-  width: 100%;
+  margin: 0.5em;
 }

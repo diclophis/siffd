@@ -24,3 +24,10 @@ class Time
     return self.month, self.day, self.year
   end
 end
+
+class Date
+  def slugify
+    return self.month, self.day, self.year
+  end
+end
+

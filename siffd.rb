@@ -189,52 +189,71 @@ module Siffd::Controllers
     end
   end
 
-  class Index < R('/', '/search/(\d+)/(\d+)/(\d+)', '/search/(.*)')
+  class Index < R('/', '/(when)/(\d+)/(\d+)/(\d+)', '/(what)/(.*)', '/(where)/(.*)')
     def get(*args)
       @popular_events, @popular_cities = Upcoming.popular
       @new_places = FortyThreePlaces.new_places 
 
-      @search = nil
-      @date = nil
-
-      case args.length
-        when 1
-          @search = args.first
-
-        when 3
-          @date = args.join("/")
-
-      end
-
-      if @search.nil? then
-        if @input.search.blank? then
-          @search = remote_location[:name]
-        else
-          @search = @input.search
-        end
-      end
-
-      if @date.nil? then
-        if @input.date.blank? then
-          @date = today.slugify.join("/")
-        else
-          @date = @input.date
-        end
-      end
-
-      @near = nil
-
-      @woeids = Location.search(@search)
-      @is_woeid = @woeids.length > 0
-
-      @metros = Upcoming.metro_search(@search)
-      @is_metro = @metros.length > 0
-
-      @events = Upcoming.text_search(@search)
-      @is_event = @events.length > 0
-
       @search_strategy = "unknown"
 
+      @what = nil
+      @when = nil
+      @where = nil
+      @location = nil
+      @city_name = nil
+      @state_name = nil
+
+      case args.shift
+        when "when"
+          @when = args.join("/")
+
+        when "what"
+          @what = args.join
+
+        when "where"
+          @where = args.join
+      end
+
+      unless @where then
+        if @input.where.blank? then
+          @where = remote_location[:name]
+        else
+          @where = @input.where
+        end
+      end
+
+      unless @when then
+        if @input.when.blank? then
+          @when = today.slugify.join("/")
+        else
+          @when = Date.parse(@input.when).slugify.join("/")
+        end
+      end
+
+      unless @what then
+        @what = @input.what
+      end
+
+      @woeids = Location.search(@where)
+      if @woeids.length > 0 then
+        centroid = @woeids[0].elements["centroid"]
+        latitude = centroid.elements["latitude"].text
+        longitude = centroid.elements["longitude"].text
+        @location  = "#{latitude},#{longitude}"
+        @city_name = @woeids[0].elements["admin2"].text
+        @state_name = @woeids[0].elements["admin1"].text
+      else
+        @metros = Upcoming.metro_search(@where)
+        if @metros.length > 0 then
+          @city_name = @metros[0].attributes["name"]
+          @state_name = @metros[0].attributes["state_name"]
+          @location = "#{city},#{state}"
+        end 
+      end
+
+      @events = Upcoming.text_search(@what, {:location => location})
+
+=begin
       if @is_event and not @is_metro then
         @search_strategy = "just search events for this text"
       elsif @is_woeid and not @is_event then
@@ -252,15 +271,18 @@ module Siffd::Controllers
       elsif 
         @search_strategy = @is_woeid.inspect + @is_metro.inspect + @is_event.inspect
       end
-
+=end
 
       #if search is a metro?
       ##does search have woeid?
       #
       #lat,long
-      
+
 
       render :index
+    end
+    def post (*args)
+      get(*args)
     end
   end
 
@@ -291,33 +313,45 @@ module Siffd::Views
       }
       body {
         form(:action => R(Login, nil)) {
-          input.identity_url!(:name => :identity_url)
+          ul.login! {
+            li {
+              a(:href => "#") {
+                "OpenID"
+              }
+            }
+            li {
+              input.identity_url!(:name => :identity_url)
+            }
+            li {
+              input(:type => :submit, :value => "login")
+            }
+          }
         } unless authenticated
-        form(:action => R(Index)) {
+        form(:action => R(Index), :method => :post) {
           ul.dates! {
             li {
               img.calendar!(:src => "/images/calendar.png", :alt => "select date")
             }
             li {
-              input.date!(:name => :date, :value => @date)
+              input.when!(:name => :when, :value => @when)
             }
             li {
-              a(:href => R(Index, *today.slugify)) {
+              a(:href => R(Index, "when", *today.slugify)) {
                 "today"
               }
             }
             li {
-              a(:href => R(Index, *tomorrow.slugify)) {
+              a(:href => R(Index, "when", *tomorrow.slugify)) {
                 "tomorrow"
               }
             }
             li {
-              a(:href => R(Index, *this_friday.slugify)) {
+              a(:href => R(Index, "when", *this_friday.slugify)) {
                 "this friday"
               }
             }
             li {
-              a(:href => R(Index, *next_friday.slugify)) {
+              a(:href => R(Index, "when", *next_friday.slugify)) {
                 "next friday"
               }
             }
@@ -335,7 +369,7 @@ module Siffd::Views
       ul.popular_cities! {
         @popular_cities.each { |city|
           li {
-            a(:href => R(Index, city)) {
+            a(:href => R(Index, "where", city)) {
               city
             }
           }
@@ -344,7 +378,7 @@ module Siffd::Views
       ul.popular_events! {
         @popular_events.each { |event|
           li {
-            a(:href => R(Index, event)) {
+            a(:href => R(Index, "what", event)) {
               event
             }
           }
@@ -353,35 +387,26 @@ module Siffd::Views
       ul.new_places! {
         @new_places.each { |place|
           li {
-            a(:href => R(Index, place)) {
+            a(:href => R(Index, "where", place)) {
               place
             }
           }
         }
       }
       div.search! {
-        input(:name => :search, :value => @search)
-        text(" near ") if @near
-        input(:name => :near, :value => @near) if @near
+        input(:name => :what, :value => @what)
+        text("&nbsp;near&nbsp;")
+        input(:name => :where, :value => @where)
+        text("&nbsp;")
+        input(:type => :submit, :value => "siffd")
       }
       div.results! {
         p {
-          @search_strategy
-        }
-        ul {
-          @metros.each { |metro|
-            li {
-              metro.attributes["name"]
-            }
-          }
-        }
-        ul {
-          @woeids.each { |woeid|
-            li {
-              woeid.elements["name"].text
-            }
-          }
-        }
+          text("results&nbsp;near&nbsp;")
+          text(@city_name)
+          text(",&nbsp;")
+          text(@state_name)
+        } if (@city_name and @state_name)
         ul {
           @events.each { |event|
             li {
