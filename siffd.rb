@@ -81,6 +81,15 @@ module Siffd
     @state.person_id
   end
 
+  def nickname
+Camping::Models::Base.logger.debug("4")
+    unless @person
+      @person = Models::Person.find(@state.person_id)
+    end
+Camping::Models::Base.logger.debug("5")
+    @person[:nickname]
+  end
+
   def today
     0.day.from_now
   end
@@ -110,6 +119,10 @@ module Siffd
 end
 
 module Siffd::Models
+  class Base
+    def Base.table_name_prefix
+    end
+  end
   class CreateSessions < V(1)
     def self.up
       create_table :sessions, :force => true do |t|
@@ -122,18 +135,15 @@ module Siffd::Models
       drop_table :sessions
     end
   end
-=begin
+
   class CreatePeople < V(2)
     def self.up
       create_table :people, :force => true do |t|
         t.column :identity_url,  :text
         t.column :display_identifier, :text
 
-        t.column :name, :text
-        t.column :email, :text
         t.column :nickname, :text
-        t.column :phone, :text
-        t.column :image_id, :string, :null => false
+        t.column :email, :text
 
         t.column :created_at, :datetime, :null => false
         t.column :updated_at, :datetime, :null => false
@@ -143,49 +153,84 @@ module Siffd::Models
       drop_table :people
     end
   end
-=end
+
+  class Person < Base
+    @@realm = "siffd.com"
+    validates_length_of :nickname, :within => 3..64
+    validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+    validates_presence_of :nickname
+    validates_presence_of :email
+    validates_uniqueness_of :identity_url
+    validates_uniqueness_of :nickname
+    validates_uniqueness_of :email
+    validates_format_of :nickname, :with => /^\w+$/ 
+
+    def self.realm
+      "http://" + @@realm
+    end
+
+    def self.realm=(realm)
+      @@realm = realm
+    end
+
+    def self.get_authorized_action_url (openid_url, return_to_url, passthru = nil)
+      @state_holder = Hash.new
+      store = ::OpenID::Store::Filesystem.new("/tmp")
+      openid_consumer = ::OpenID::Consumer.new(@state_holder, store)
+      check_id_request = openid_consumer.begin(openid_url)
+      openid_sreg = ::OpenID::SReg::Request.new(['nickname', 'email'])
+      check_id_request.add_extension(openid_sreg)
+      #openid_ax_nickname = ::OpenID::AX::AttrInfo.new("http://axschema.org/namePerson/friendly")
+      #openid_ax_email = ::OpenID::AX::AttrInfo.new("http://axschema.org/contact/email")
+      #openid_ax_phone_number = ::OpenID::AX::AttrInfo.new("http://axschema.org/contact/phone/default")
+      #openid_ax = ::OpenID::AX::FetchRequest.new
+      #openid_ax.add(openid_ax_nickname)
+      #openid_ax.add(openid_ax_email)
+      #openid_ax.add(openid_ax_phone_number)
+      #check_id_request.add_extension(openid_ax)
+      url = check_id_request.redirect_url(self.realm, self.realm + return_to_url)
+      return [@state_holder, url]
+    end
+  end
 end
 
 module Siffd::Controllers
   class Login < R("/dashboard/login(.*)")
     include Camping::Session
     def get(*args)
-=begin
-      begin
-        if (@input.has_key?("openid.mode")) then
-          user = User.find_by_openid_url!(@state, @input, R(Login, nil))
-          @state.user_id = user.id
-          return redirect(R(Dashboard))
-        else
-          raise "Login Required"
+      if (@input.has_key?("openid.mode")) then
+        this_url = Person.realm + R(Login, nil)
+        store = ::OpenID::Store::Filesystem.new("/tmp")
+        openid_consumer = ::OpenID::Consumer.new(@state, store)
+        openid_response = openid_consumer.complete(@input, this_url)
+        if openid_response.status == :success then
+          identity_url = openid_response.identity_url
+          person = Person.find_by_identity_url(identity_url)
+          unless person
+            openid_sreg = ::OpenID::SReg::Response.from_success_response(openid_response)
+            person = Person.new
+            person.identity_url = identity_url
+            person.display_identifier = openid_response.display_identifier
+            person.identity_url = openid_response.identity_url
+            person.nickname = openid_sreg["nickname"]
+            person.email = openid_sreg["email"]
+            person.save!
+          end
+          @state.person_id = person.id
+          return redirect(R(Index))
         end
-      rescue Exception => e
-        @login_exception = e
-        other_layout {
-          render :login 
-        }
       end
-=end
     end
     def post(*args)
-=begin
-      begin
-        new_state, authorized_action_url = User.get_authorized_action_url(@input.openid_url, R(Login, nil))
-        @state = new_state
-        redirect(authorized_action_url)
-      rescue Exception => e
-        @login_exception = e
-        other_layout {
-          render :login
-        }
-      end
-=end
+      @state, authorized_action_url = Person.get_authorized_action_url(@input.identity_url, R(Login, nil))
+      redirect(authorized_action_url)
     end
   end
 
   class Logout < R("/dashboard/logout")
     def get
-      redirect R(Index)
+      @state.person_id = nil
+      redirect(R(Index))
     end
   end
 
@@ -202,6 +247,7 @@ module Siffd::Controllers
       @location = nil
       @city_name = nil
       @state_name = nil
+      @events = []
 
       case args.shift
         when "when"
@@ -251,33 +297,7 @@ module Siffd::Controllers
         end 
       end
 
-      @events = Upcoming.text_search(@what, {:location => location})
-
-=begin
-      if @is_event and not @is_metro then
-        @search_strategy = "just search events for this text"
-      elsif @is_woeid and not @is_event then
-        if @woeids.length == 1 then
-          @near = @woeids[0].elements["name"].text + ", " + @woeids[0].elements["admin1"].text + " " + @woeids[0].elements["country"].text
-          @search = ""
-        end
-        @search_strategy = "search for events near this place, using lat,long"
-      elsif @is_woeid and @is_event and @is_metro then
-        if @woeids.length == 1 then
-          @near = @woeids[0].elements["name"].text + ", " + @woeids[0].elements["admin1"].text + " " + @woeids[0].elements["country"].text
-          @search = ""
-        end
-        @search_strategy = "search for everything near this place, using lat,long"
-      elsif 
-        @search_strategy = @is_woeid.inspect + @is_metro.inspect + @is_event.inspect
-      end
-=end
-
-      #if search is a metro?
-      ##does search have woeid?
-      #
-      #lat,long
-
+      @events = Upcoming.text_search(@what, @location)
 
       render :index
     end
@@ -312,21 +332,30 @@ module Siffd::Views
         meta(:name => "viewport", :content => "width=850")
       }
       body {
-        form(:action => R(Login, nil)) {
+        if authenticated then
           ul.login! {
             li {
-              a(:href => "#") {
-                "OpenID"
-              }
-            }
-            li {
-              input.identity_url!(:name => :identity_url)
-            }
-            li {
-              input(:type => :submit, :value => "login")
+              text("welcome&nbsp;")
+              nickname
             }
           }
-        } unless authenticated
+        else
+          form(:action => R(Login, nil), :method => :post) {
+            ul.login! {
+              li {
+                a(:href => "#") {
+                  "OpenID"
+                }
+              }
+              li {
+                input.identity_url!(:name => :identity_url)
+              }
+              li {
+                input(:type => :submit, :value => "login")
+              }
+            }
+          }
+        end
         form(:action => R(Index), :method => :post) {
           ul.dates! {
             li {
