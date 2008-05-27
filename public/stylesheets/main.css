@@ -15,7 +15,7 @@ ul {
   padding: 0;
 }
 
-a, p, li {
+a, p, li, h1 {
   margin: 0;
   padding: 0;
 }
@@ -107,4 +107,39 @@ input#when {
   position: absolute;
   top: 20em;
   margin: 0.5em;
+  width: 99%;
 }
+
+#events {
+  position: absolute;
+  top: 4em;
+  left: 4%;
+  width: 30%;
+  height: 10em;
+}
+
+#businesses {
+  position: absolute;
+  top: 4em;
+  left: 40%;
+  width: 30%;
+  height: 10em;
+}
+
+#businesses li {
+  margin: 0 0 0.25em 0;
+}
+
+#businesses img {
+  vertical-align: middle;
+  margin: 0 0.25em 0 0;
+}
+
+#neighbors {
+  position: absolute;
+  top: 4em;
+  left: 75%;
+  width: 25%;
+  height: 10em;
+}
+

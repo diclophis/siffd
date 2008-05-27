@@ -39,6 +39,7 @@ require '/var/www/siffd/hostip'
 require '/var/www/siffd/forty_three_places'
 require '/var/www/siffd/upcoming'
 require '/var/www/siffd/location'
+require '/var/www/siffd/yelp'
 
 Camping.goes :Siffd
 
@@ -180,14 +181,6 @@ module Siffd::Models
       check_id_request = openid_consumer.begin(openid_url)
       openid_sreg = ::OpenID::SReg::Request.new(['nickname', 'email'])
       check_id_request.add_extension(openid_sreg)
-      #openid_ax_nickname = ::OpenID::AX::AttrInfo.new("http://axschema.org/namePerson/friendly")
-      #openid_ax_email = ::OpenID::AX::AttrInfo.new("http://axschema.org/contact/email")
-      #openid_ax_phone_number = ::OpenID::AX::AttrInfo.new("http://axschema.org/contact/phone/default")
-      #openid_ax = ::OpenID::AX::FetchRequest.new
-      #openid_ax.add(openid_ax_nickname)
-      #openid_ax.add(openid_ax_email)
-      #openid_ax.add(openid_ax_phone_number)
-      #check_id_request.add_extension(openid_ax)
       url = check_id_request.redirect_url(self.realm, self.realm + return_to_url)
       return [@state_holder, url]
     end
@@ -237,9 +230,15 @@ module Siffd::Controllers
   class Index < R('/', '/(when)/(\d+)/(\d+)/(\d+)', '/(what)/(.*)', '/(where)/(.*)')
     def get(*args)
       @popular_events, @popular_cities = Upcoming.popular
-      @new_places = FortyThreePlaces.new_places 
-
-      @search_strategy = "unknown"
+      #@new_places = FortyThreePlaces.new_places 
+      @new_places = [
+        "Metropolitan Museum of Art",
+        "Astrodome",
+        "Paramount Theatre",
+        "The Smithsonian",
+        "Mile High Stadium",
+        "The Louvre"
+      ]
 
       @what = nil
       @when = nil
@@ -248,6 +247,8 @@ module Siffd::Controllers
       @city_name = nil
       @state_name = nil
       @events = []
+      @businesses = []
+      @neighbors = []
 
       case args.shift
         when "when"
@@ -286,8 +287,11 @@ module Siffd::Controllers
         latitude = centroid.elements["latitude"].text
         longitude = centroid.elements["longitude"].text
         @location  = "#{latitude},#{longitude}"
+        @woeid = @woeids[0].elements["woeid"].text
         @city_name = @woeids[0].elements["admin2"].text
         @state_name = @woeids[0].elements["admin1"].text
+        @businesses = Yelp.business_review_search_geo(latitude, longitude, @what)
+        @neighbors = Location.neighbors(@woeid)
       else
         @metros = Upcoming.metro_search(@where)
         if @metros.length > 0 then
@@ -298,6 +302,8 @@ module Siffd::Controllers
       end
 
       @events = Upcoming.text_search(@what, @location)
+    
+      #@what = "Everything" if @what.blank?
 
       render :index
     end
@@ -335,18 +341,13 @@ module Siffd::Views
         if authenticated then
           ul.login! {
             li {
-              text("welcome&nbsp;")
+              text("Logged&nbsp;in&nbsp;as:&nbsp;")
               nickname
             }
           }
         else
           form(:action => R(Login, nil), :method => :post) {
             ul.login! {
-              li {
-                a(:href => "#") {
-                  "OpenID"
-                }
-              }
               li {
                 input.identity_url!(:name => :identity_url)
               }
@@ -430,16 +431,42 @@ module Siffd::Views
         input(:type => :submit, :value => "siffd")
       }
       div.results! {
-        p {
-          text("results&nbsp;near&nbsp;")
+        h1 {
+          if (@what) then
+            text(@what)
+          else
+            text("Everything")
+          end
+          text("&nbsp;near&nbsp;")
           text(@city_name)
           text(",&nbsp;")
           text(@state_name)
         } if (@city_name and @state_name)
-        ul {
+        ul.events! {
           @events.each { |event|
             li {
-              event.attributes["name"]
+              a(:href => R(Index, "what", event.attributes["name"])) {
+                event.attributes["name"]
+              }
+            }
+          }
+        }
+        ul.businesses! {
+          @businesses.each { |business|
+            li {
+              img(:src => business["photo_url"]) unless business["photo_url"].blank?
+              a(:href => R(Index, "what", business["name"])) {
+                text(business["name"])
+              }
+            }
+          }
+        }
+        ul.neighbors! {
+          @neighbors.each { |neighbor|
+            li {
+              a(:href => R(Index, "where", neighbor.elements["name"].text)) {
+                text(neighbor.elements["name"].text)
+              }
             }
           }
         }

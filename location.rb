@@ -16,4 +16,19 @@ class Location
     return places
   end
 
+  def self.neighbors (woeid)
+    places = []
+    url = BASE_URL + "place/#{woeid}/neighbors"
+
+Camping::Models::Base.logger.debug(url)
+
+    open(url) { |xml|
+      doc = REXML::Document.new(xml)
+      doc.elements.each("/places/place") { |place|
+        places << place
+      }
+    }
+    return places
+  end
+
 end

@@ -57,8 +57,6 @@ class Upcoming
 
     url = BASE_URL + query_string
 
-Camping::Models::Base.logger.debug(url)
-
     open(url) { |xml|
       doc = REXML::Document.new(xml)
       doc.elements.each("/rsp/event") { |event|
