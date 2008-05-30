@@ -5,11 +5,15 @@ class Hostip
   HOST_IP_PATH = '/HostipLookupResultSet/gml:featureMember/Hostip'
   def self.geolocate (ip)
     url = BASE_URI + ip + "&position=true"
+Camping::Models::Base.logger.debug(url)
     open(url) { |xml|
       doc = REXML::Document.new(xml)
       ret_h = Hash.new('')
       ret_h[:name] = ""
       ret_h[:name] = doc.elements["#{HOST_IP_PATH}/gml:name"].text
+      if ret_h[:name] == "(Unknown City?)" then
+        ret_h[:name] = "San Francisco"
+      end
       ret_h[:country_name] = doc.elements["#{HOST_IP_PATH}/countryName"].text
       ret_h[:country_abbrev] = doc.elements["#{HOST_IP_PATH}/countryAbbrev"].text
       coordinates = ''

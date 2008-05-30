@@ -7,6 +7,7 @@ class Location
   def self.search (query)
     places = []
     url = BASE_URL + "places.q('" + URI.encode(query) + "')"
+Camping::Models::Base.logger.debug(url)
     open(url) { |xml|
       doc = REXML::Document.new(xml)
       doc.elements.each("/places/place") { |place|

@@ -6,28 +6,28 @@ require 'gserver'
 require 'uri'
 require 'ftools'
 require 'rubygems'
-require 'RMagick'
-include Magick
+#require 'RMagick'
+#include Magick
 require 'time'
 require 'timeout'
 require 'open3'
 require 'open-uri'
-require 'redcloth'
+#require 'redcloth'
 require 'digest/md5'
 require 'daemons'
 require 'benchmark'
-require 'ruby2ruby'
+#require 'ruby2ruby'
 require 'drb'
 require 'uuidtools'
-require 'right_aws'
+#require 'right_aws'
 require 'rexml/document'
 require 'hpricot'
 
 #import into the system
 require 'camping'
-require 'camping/fastcgi'
+#require 'camping/fastcgi'
 require 'camping/session'
-require 'acts_as_versioned'
+#require 'acts_as_versioned'
 require 'action_mailer'
 require 'tmail'
 require 'openid'
@@ -43,6 +43,7 @@ require '/var/www/siffd/yelp'
 
 Camping.goes :Siffd
 
+=begin
 module SessionSupport
   def self.included(base)
     base.class_eval do
@@ -52,8 +53,14 @@ module SessionSupport
     end
   end
 end
+=end
 
 module Siffd
+  include Camping::Session
+  @@state_secret = "wangchung!"
+  @@state_timeout = 99999
+
+=begin
   def service(*a)
     session = Camping::Models::Session.persist(@cookies)
     app = self.class.name.gsub(/^(\w+)::.+$/, '\1')
@@ -77,6 +84,7 @@ module Siffd
     end
     return self
   end
+=end
 
   def authenticated
     @state.person_id
@@ -189,7 +197,6 @@ end
 
 module Siffd::Controllers
   class Login < R("/dashboard/login(.*)")
-    include Camping::Session
     def get(*args)
       if (@input.has_key?("openid.mode")) then
         this_url = Person.realm + R(Login, nil)
@@ -281,7 +288,7 @@ module Siffd::Controllers
         @what = @input.what
       end
 
-      @woeids = Location.search(@where)
+      @woeids = Location.search(@where) unless @where.blank?
       if @woeids.length > 0 then
         centroid = @woeids[0].elements["centroid"]
         latitude = centroid.elements["latitude"].text
@@ -313,7 +320,6 @@ module Siffd::Controllers
   end
 
   class Dashboard < R("/dashboard")
-    include SessionSupport
     def get
       render :dashboard 
     end

@@ -14,7 +14,7 @@ end
 class Siffd::Controllers::NotFound
   def get(p)
     r(404, Mab.new do
-      h1((p + " not found"))
+      h1((p + " not found wang chung"))
     end)
   end
 end
