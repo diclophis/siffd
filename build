@@ -1,0 +1,500 @@
+   18  apt-cache search git
+   19  apt-cache search git | grep client
+   20  clear
+   21  apt-cache search git | grep client
+   22  apt-cache search git | grep source
+   23  apt-get install git-core
+   24  apt-get install apache2
+   25  apt-get install libcurl-dev
+   26  apt-get install curl-dev
+   27  apt-cache search curl
+   28  apt-cache search curl | grep dev
+   29  apt-get install libwww-ssl-dev
+   30  apt-get install libcurl4-openssl-dev
+   31  apt-get install curl
+   32  wget "http://rubyforge.org/frs/download.php/35283/rubygems-1.1.1.tgz"
+   33  tar zxvf rubygems-1.1.1.tgz 
+   34  cd rubygems-1.1.1
+   35  ls
+   36  vi README 
+   37  ruby setup.rb 
+   38  apt-get install rdoc
+   39  ruby setup.rb 
+   40  dc
+   41  cd
+   42  gem1.8 list
+   43  gem
+   44  wget "http://internap.dl.sourceforge.net/sourceforge/mod-fcgid/mod_fcgid.2.2.tgz"
+   45  tar zxvf mod_fcgid.2.2.tgz 
+   46  cd mod_fcgid.2.2
+   47  ls
+   48  vi INSTALL.txt 
+   49  vi INSTALL.txt 
+   50  vi Makefile
+   51  vi Makefile
+   52  apt-cache search fcgi
+   53  apt-cache show libapache2-mod-fcgid
+   54  apt-get install libapache2-mod-fcgid
+   55  /etc/init.d/apache2 reload
+   56  tail -f /var/log/apache2/error.log 
+   57  /etc/init.d/apache2 stop
+   58  /etc/init.d/apache2 stop
+   59  tail -f /var/log/apache2/error.log 
+   60  tail -f /var/log/apache2/access.log 
+   61  /etc/init.d/apache2 start
+   62  tail -f /var/log/apache2/access.log 
+   63  tail -f /var/log/apache2/error.log 
+   64  tail -f /var/log/apache2/error.log 
+   65  tail -f /var/log/apache2/access.log 
+   66  tail -f /var/log/apache2/error.log 
+   67  cd
+   68  vi /etc/apache2/sites-available/default 
+   69  cd /var/www/
+   70  git clone git@github.com:diclophis/siffd.git
+   71  vi ~/.ssh/authorized_keys 
+   72  ps
+   73  ps aux | grep ssh-agent
+   74  ssh-agent
+   75  eval 'ssh-agent'
+   76  eval `ssh-agent`
+   77  vi ~/.ssh/gsg-keypair
+   78  ls -l ~/.ssh/
+   79  chmod -Rv e-r ~/.ssh/gsg-keypair 
+   80  chmod -Rv 600 ~/.ssh/gsg-keypair 
+   81  ssh-aget add ~/.ssh/gsg-keypair 
+   82  ssh-agent add ~/.ssh/gsg-keypair 
+   83  ssh-agent add ~/.ssh/gsg-keypair 
+   84  ssh-agent add ~/.ssh/gsg-keypair 
+   85  ssh-add ~/.ssh/gsg-keypair 
+   86  git clone git@github.com:diclophis/siffd.git
+   87  git clone git@github.com:diclophis/siffd.git
+   88  cp /etc/apache2/sites-available/default /etc/apache2/sites-available/001-siffd
+   89  vi /etc/apache2/sites-available/001-siffd 
+   90  ln -s /etc/apache2/sites-available/001-siffd /etc/apache2/sites-enabled/
+   91  /etc/init.d/apache2 reload
+   92  ls -ltr /var/log/apache2/
+   93  cd siffd/
+   94  ls -l public/
+   95  vi /etc/apache2/sites-available/001-siffd 
+   96  /etc/init.d/apache2 reload
+   97  apt-cache search rewrite
+   98  apt-cache search rewrite | grep apac
+   99  apt-cache search mod | grep apac
+  100  apt-cache search mod | grep apac | grep re
+  101  ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/
+  102  /etc/init.d/apache2 reload
+  103  ls -l /var/www/
+  104  ls -l /var/www/siffd/public/
+  105  tail -f /var/log/apache2/error.log 
+  106  tail -f /var/log/apache2/access.log 
+  107  tail -f /var/log/apache2/siffd.error.log 
+  108  vi /etc/apache2/sites-available/001-siffd 
+  109  /etc/init.d/apache2 reload
+  110  tail -f /var/log/apache2/siffd.error.log 
+  111  tail -f /var/log/apache2/error.log 
+  112  tail -f /var/log/apache2/siffd.access.log 
+  113  cd public/
+  114  ls
+  115  ruby dispatch.fcgi 
+  116  vi dispatch.fcgi 
+  117  cd 
+  118  vi /etc/apache2/sites-available/001-siffd 
+  119  /etc/init.d/apache2 reload
+  120  tail -f /var/log/apache2/error.log 
+  121  tail -f /var/log/apache2/siffd.error.log 
+  122  tail -f /var/log/apache2/siffd.error.log 
+  123  tail -f /var/log/apache2/siffd.access.log 
+  124  pwd
+  125  vi /etc/apache2/sites-available/001-siffd 
+  126  /etc/init.d/apache2 reload
+  127  tail -f /var/log/apache2/error.log 
+  128  /etc/init.d/apache2 restart
+  129  tail -f /var/log/apache2/error
+  130  tail -f /var/log/apache2/error.log 
+  131  tail -f /var/log/apache2/siffd.
+  132  tail -f /var/log/apache2/siffd.error.log 
+  133  ls
+  134  cd /var/www/siffd/public/
+  135  ls
+  136  ls -l
+  137  ruby dispatch.fcgi 
+  138  cd ..
+  139  cd public/
+  140  chown -Rv www-data:www-data dispatch.fcgi 
+  141  cd ..
+  142  ls
+  143  ps aux
+  144  tail -f /var/log/apache2/access.log 
+  145  vi /etc/apache2/sites-available/001-siffd 
+  146  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  147  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.access.log 
+  148  vi /etc/apache2/sites-available/001-siffd 
+  149  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.access.log 
+  150  vi /etc/apache2/sites-available/001-siffd 
+  151  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.access.log 
+  152  /etc/init.d/apache2 reload; tail -f /var/log/apache2/error.log 
+  153  /etc/init.d/apache2 reload; 
+  154  /etc/init.d/apache2 config-test
+  155  apache2ctl 
+  156  apache2ctl configtest
+  157  /etc/init.d/apache2 reload; 
+  158  tail -f /var/log/apache2/error.log 
+  159  /etc/init.d/apache2 restart
+  160  tail -f /var/log/apache2/error.log 
+  161  vi /etc/apache2/sites-available/001-siffd 
+  162  /etc/init.d/apache2 restart
+  163  tail -f /var/log/apache2/error.log 
+  164  tail -f /var/log/apache2/siffd.error.log 
+  165  tail -f /var/log/apache2/siffd.rewrite.log 
+  166  vi /etc/apache2/sites-available/default 
+  167  chown www-data:www-data public
+  168  cd 
+  169  chown www-data:www-data siffd
+  170  ls -l
+  171  chmod 644 siffd/
+  172  ls -l
+  173  ls ~/
+  174  ls -l ~/
+  175  /etc/init.d/apache2 reload
+  176  tail -f /var/log/apache2/siffd.error.log 
+  177  ls -l 
+  178  chmod 655 siffd/
+  179  ls -l 
+  180  cd siffd/
+  181  chmod 655 public/
+  182  ls -l
+  183  cd public/
+  184  ls
+  185  ls -l
+  186  cd ..
+  187  cd ..
+  188  chmod 755 siffd/
+  189  chmod 755 siffd/public/
+  190  ls
+  191  cd siffd/
+  192  ls
+  193  ruby siffd.rb 
+  194  cd public/
+  195  ls
+  196  ls -l
+  197  chmod 755 dispatch.fcgi 
+  198  ls -l
+  199  chmod 744 dispatch.fcgi 
+  200  ls -l
+  201  vi dispatch.fcgi 
+  202  which ruby
+  203  vi /etc/apache2/mods-enabled/fcgid.conf 
+  204  vi /etc/apache2/mods-enabled/fcgid.load 
+  205  ls
+  206  vi /etc/apache2/sites-available/default 
+  207  /etc/init.d/apache2 reload
+  208  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  209  vi /etc/apache2/sites-available/001-siffd 
+  210  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  211  vi wang.cgi
+  212  chmpd +x wang.
+  213  chmpd +x wang.cgi 
+  214  chmod +x wang.cgi 
+  215  ./wang.cgi 
+  216  vi /etc/apache2/sites-available/001-siffd 
+  217  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  218  vi /etc/apache2/apache2.conf 
+  219  vi /etc/apache2/httpd.conf 
+  220  vi /etc/apache2/mods-enabled/cgid.load 
+  221  vi /etc/apache2/mods-enabled/rewrite.load 
+  222  vi /etc/apache2/mods-enabled/fcgid.
+  223  vi /etc/apache2/mods-enabled/fcgid.conf 
+  224  vi /etc/apache2/mods-available/cgi.load 
+  225  vi /etc/apache2/mods-available/cgi.load 
+  226  vi /etc/apache2/httpd.conf 
+  227  vi /etc/apache2/envvars 
+  228  vi /etc/apache2/ports.conf 
+  229  vi /etc/apache2/conf.d/charset 
+  230  vi /etc/apache2/sites-available/default 
+  231  vi /etc/apache2/sites-available/default 
+  232  /etc/init.d/apache2 reload
+  233  mkdir ../../default
+  234  mv ../../index.html ../../default/
+  235  cd ..
+  236  ruby siffd.rb 
+  237  gem1.8 install RMagick
+  238  gem install rails camping rmagick
+  239  gem1.8 install rails camping rmagick
+  240  vi siffd.rb 
+  241  ruby siffd.rb 
+  242  vi siffd.rb 
+  243  ruby siffd.rb 
+  244  vi siffd.rb 
+  245  ruby siffd.rb 
+  246  gem install daemons
+  247  gem1, install daemons
+  248  gem1.8 install daemons
+  249  vi /etc/apache2/sites-available/001-siffd 
+  250  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  251  vi /etc/apache2/sites-available/001-siffd 
+  252  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  253  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  254  /etc/init.d/apache2 restart; tail -f /var/log/apache2/siffd.error.log
+  255  /etc/init.d/apache2 restart; tail -f /var/log/apache2/error.log 
+  256  ps aux
+  257  killall -9 apache2
+  258  killall -9 /usr/sbin/apache2
+  259  ps aux
+  260  ps aux | grep apache
+  261  /etc/init.d/apache2 start
+  262  tail -f /var/log/apache2/error.log 
+  263  tail -f /var/log/apache2/siffd.error.log 
+  264  vi /etc/apache2/sites-available/001-siffd 
+  265  vi /etc/apache2/mods-available/fcgid.conf 
+  266  /etc/init.d/apache2 reload
+  267  tail -f /var/log/apache2/siffd.error.log
+  268  tail -f /var/log/apache2/siffd.access.log 
+  269  ls -l /var/lib/apache2/
+  270  ls -l /var/lib/apache2/fcgid/
+  271  ls -ltr /var/lib/apache2/fcgid/sock/
+  272  gem install fcgi
+  273  gem1.8 install fcgi
+  274  vi /usr/lib/ruby/gems/1.8/gems/fcgi-0.8.7/ext/fcgi/gem_make.out
+  275  gem1.8 mkmf
+  276  gem1.8 install mkmf
+  277  vi /usr/lib/ruby/gems/1.8/gems/fcgi-0.8.7/ext/fcgi/gem_make.out
+  278  apt-cache search mkmf
+  279  vi /usr/lib/ruby/gems/1.8/gems/fcgi-0.8.7/ext/fcgi/gem_make.out
+  280  apt-get install ruby1.8-dev
+  281  gem install rmagick fcgi
+  282  gem1.8 install rmagick fcgi
+  283  gem1.8 install fcgi
+  284  apt-cache search fcgi
+  285  ls /usr/include/
+  286  apt-cache search fcgi
+  287  apt-get install libfcgi-ruby1.8
+  288  apt-get install libfcgi01db1
+  289  apt-get install libfcgi01dbl
+  290  apt-get install libfcgi0ldbl
+  291  gem1.8 install fcgi
+  292  apt-cache show libfcgi-ruby1.8
+  293  apt-get install libfcgi-ruby1.8
+  294  /etc/init.d/apache2 restart
+  295  ruby siffd.rb 
+  296  vi siffd.rb 
+  297  ruby siffd.rb 
+  298  gem1.8 install uuidtools
+  299  vi siffd.rb 
+  300  gem1.8 install hpricot openid
+  301  ruby siffd.rb 
+  302  gem1.8 install hpricot ruby-openid
+  303  ruby siffd.rb
+  304  /etc/init.d/apache2 reload; tail -f /var/log/apache2/siffd.error.log 
+  305  /etc/init.d/apache2 reload; tail -f /var/log/apache2/error.log 
+  306  /etc/init.d/apache2 reload; tail -f /var/log/apache2/access.log 
+  307  cd
+  308  ls -l
+  309  cd /
+  310  ls -l
+  311  cd var/
+  312  chown -Rv root:root www/siffd/
+  313  ls -l
+  314  cd run/
+  315  vi /etc/apache2/mods-available/fcgid.load 
+  316  vi /etc/apache2/mods-available/fcgid.conf
+  317  /etc/init.d/apache2 reload
+  318  ls -ltr /tmp/
+  319  cd ..
+  320  ls -l
+  321  cd www/
+  322  ls -l
+  323  cd siffd/
+  324  ls
+  325  ls -l
+  326  chmod 744 siffd.rb 
+  327  ls -l
+  328  chmod o-x siffd.rb 
+  329  ls
+  330  ls -l
+  331  chmod 644 siffd.rb 
+  332  ls -l
+  333  cd public/
+  334  ls
+  335  ls -l
+  336  chmod 755 dispatch.fcgi 
+  337  ls
+  338  ls -l
+  339  ./dispatch.fcgi 
+  340  cd ..
+  341  vi test.sh
+  342  chmod +x test.
+  343  chmod +x test.sh 
+  344  ./test.sh 
+  345  vi boot.rb
+  346  vi ~/.vimrc
+  347  vi ~/.vimrc
+  348  vi boot.rb 
+  349  ./test.sh 
+  350  /etc/init.d/apache2 reload
+  351  vi /etc/apache2/sites-available/001-siffd 
+  352  /etc/init.d/apache2 reload
+  353  a2enmod fcgid
+  354  ls -l /etc/apache2/mods-available/
+  355  ls -l /etc/apache2/mods-enabled/
+  356  a2dismod cgid
+  357  a2dismod status
+  358  /etc/init.d/apache2 force-reload
+  359  vi /etc/apache2/sites-available/default 
+  360  vi /etc/apache2/sites-available/001-siffd 
+  361  vi /etc/apache2/sites-available/default 
+  362  vi /etc/apache2/sites-available/001-siffd 
+  363  vi /etc/apache2/sites-available/001-siffd 
+  364  vi /etc/apache2/sites-available/default 
+  365  /etc/init.d/apache2 force-reload
+  366  tail -f /var/log/apache2/
+  367  tail -f /var/log/apache2/error.log 
+  368  tail -f /var/log/apache2/access.log 
+  369  tail -f /var/log/apache2/siffd.
+  370  tail -f /var/log/apache2/siffd.error.log 
+  371  ps aux
+  372  ls -l /var/lib/apache2/
+  373  ls -l /var/lib/apache2/
+  374  ls -l /var/lib/apache2/fcgid/sock/
+  375  ls -l /var/lib/apache2/fcgid/sock/
+  376  /etc/init.d/apache2 force-reload
+  377  vi /etc/apache2/sites-available/001-siffd 
+  378  /etc/init.d/apache2 force-reload
+  379  vi /etc/apache2/sites-available/001-siffd 
+  380  ls -l /var/lo
+  381  ls -ltr /var/lo
+  382  ls -ltr /var/log/
+  383  tail -f /var/log/messages 
+  384  ls -l /var/
+  385  ls -l /var/log/
+  386  vi /etc/apache2/mods-enabled/fcgid.conf 
+  387  vi /etc/apache2/mods-enabled/fcgid.load 
+  388  ldconfig
+  389  vi /etc/apache2/sites-available/001-siffd 
+  390  /etc/init.d/apache2 force-reload
+  391  tail -f /var/log/apache2/siffd.error.log 
+  392  ls -ltr /var/log/
+  393  tail -f /var/log/siffd.log 
+  394  vi Rakefile 
+  395  vi boot.rb 
+  396  rake migrate
+  397  mysqladmin create siffd
+  398  mysqladmin -u root -p create siffd
+  399  mysqladmin create siffd
+  400  rake migrate
+  401  ls -ltr /var/log/apache2/
+  402  tail -f /var/log/apache2/error.log 
+  403  tail -n 200 -f /var/log/apache2/error.log 
+  404  chown -Rf root:www-data /var/log/siffd.log 
+  405  chmod g+w /var/log/siffd.log 
+  406  tail -n 200 -f /var/log/apache2/error.log 
+  407  vi public/dispatch.fcgi 
+  408  cd /usr/lib/ruby/gems/1.8/gems/camping-1.5/
+  409  ls
+  410  cd ..
+  411  git clone git://github.com/why/camping.git
+  412  ls camping
+  413  gem uninstall camping
+  414  gem1.8 uninstall camping
+  415  ls 
+  416  ls ..
+  417  /etc/init.d/apache2 force-reload
+  418  ls -l /var/log/
+  419  ls -l /var/log/a
+  420  ls -l /var/log/ap
+  421  ls -l /var/log/apache2/
+  422  tail -f /var/log/apache2/error.log 
+  423  ls
+  424  cd ..
+  425  ls
+  426  cd ..
+  427  ls
+  428  cd ..
+  429  ls
+  430  cd 1.8/
+  431  ls
+  432  cd ../gems/
+  433  ls
+  434  cd 1.8/
+  435  ls
+  436  cd specifications/
+  437  ls
+  438  vi actionmailer-2.0.2.gemspec 
+  439  cd ..
+  440  cd
+  441  gem install camping
+  442  gem1.8 install camping
+  443  cd /usr/lib/ruby/gems/1.8/gems/
+  444  ls
+  445  rm -Rf camping
+  446  mv camping-1.5/ ~/camping-1.5.orig
+  447  git clone git://github.com/why/camping.git
+  448  ln -s /usr/lib/ruby/gems/1.8/gems/camping/ /usr/lib/ruby/gems/1.8/gems/camping-1.5
+  449  /etc/init.d/apache2 force-reload
+  450  tail -f /var/log/apache2/error.log 
+  451  gem1.8 install rack
+  452  /etc/init.d/apache2 force-reload; tail -f /var/log/apache2/error.log 
+  453  vi /var/www/siffd/siffd.rb 
+  454  /etc/init.d/apache2 force-reload; tail -f /var/log/apache2/error.log 
+  455  vi camping/lib/camping/server.rb 
+  456  vi camping/lib/camping-unabridged.rb 
+  457  vi camping/CHANGELOG 
+  458  vi camping/examples/blog.rb 
+  459  vi camping/examples/tepee.rb 
+  460  vi /var/www/siffd/siffd.rb 
+  461  vi /var/www/siffd/public/dispatch.fcgi 
+  462  /etc/init.d/apache2 force-reload; tail -f /var/log/apache2/error.log 
+  463  vi /var/www/siffd/public/dispatch.fcgi 
+  464  grep -Rn "FastCGI" *
+  465  vi rack-0.3.0/README 
+  466  vi rack-0.3.0/lib/rack/adapter/camping.rb 
+  467  vi /var/www/siffd/public/dispatch.fcgi 
+  468  vi /var/www/siffd/siffd.rb 
+  469  /etc/init.d/apache2 force-reload; tail -f /var/log/apache2/error.log 
+  470  tail -f /var/log/siffd.log 
+  471  tail -f /var/log/apache2/siffd.error.log 
+  472  cd /var/www/siffd/
+  473  ./test.sh 
+  474  vi /usr/lib/ruby/gems/1.8/gems/camping/lib/camping-unabridged.rb 
+  475  vi /usr/lib/ruby/gems/1.8/gems/camping/lib/camping
+  476  vi /usr/lib/ruby/gems/1.8/gems/camping/lib/camping.rb 
+  477  which rackup
+  478  vi public/dispatch.fcgi 
+  479  /etc/init.d/apache2 force-reload; tail -f /var/log/apache2/error.log 
+  480  ./test.sh 
+  481  vi public/dispatch.fcgi 
+  482  ./test.sh 
+  483  rackup 
+  484  vi public/dispatch.fcgi 
+  485  vi public/dispatch.fcgi 
+  486  ./test.sh 
+  487  vi public/dispatch.fcgi 
+  488  vi /usr/lib/ruby/gems/1.8/gems/camping/lib/camping-unabridged.rb 
+  489  vi public/dispatch.fcgi 
+  490  ./test.sh 
+  491  vi public/dispatch.fcgi 
+  492  vi siffd.rb 
+  493  vi public/dispatch.fcgi 
+  494  ./test.sh 
+  495  vi public/dispatch.fcgi 
+  496  ./test.sh 
+  497  /etc/init.d/apache2 force-reload; tail -f /var/log/apache2/error.log 
+  498  vi /usr/lib/ruby/gems/1.8/gems/camping/lib/camping-unabridged.rb 
+  499  vi /usr/lib/ruby/gems/1.8/gems/camping/bin/camping 
+  500  vi /usr/lib/ruby/gems/1.8/gems/camping/lib/camping/server.rb 
+  501  reset
+  502  cd /var/www/siffd/
+  503  vi public/dispatch.fcgi 
+  504  vi boot.rb 
+  505  cd /usr/lib/ruby/gems/1.8/gems/
+  506  ls
+  507  vi rack-0.3.0/lib/rack/handler/fastcgi.rb 
+  508  cd ..
+  509  mkdir ~/Archive
+  510  ls
+  511  cd gems/
+  512  mv camping* ~/Archive/
+  513  ls -l ~/Archive/
+  514  cd /var/www/siffd/
+  515  ps aux
+  516  history
+  517  history > build
