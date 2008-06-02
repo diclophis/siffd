@@ -34,11 +34,10 @@ class Upcoming
 
     url = BASE_URL + query_string
 
-    open(url) { |xml|
-      doc = REXML::Document.new(xml)
-      doc.elements.each("/rsp/metro") { |metro|
-        metros << metro
-      }
+    xml = Fast.fetch(url)
+    doc = REXML::Document.new(xml)
+    doc.elements.each("/rsp/metro") { |metro|
+      metros << metro
     }
     return metros 
   end
@@ -57,13 +56,32 @@ class Upcoming
 
     url = BASE_URL + query_string
 
-    open(url) { |xml|
-      doc = REXML::Document.new(xml)
-      doc.elements.each("/rsp/event") { |event|
-        events << event
-      }
+    xml = Fast.fetch(url)
+    doc = REXML::Document.new(xml)
+    doc.elements.each("/rsp/event") { |event|
+      events << event
     }
     return events 
+  end
+
+  def self.categories
+    categories = []
+    parameters = {}
+    parameters[:api_key] = API_KEY
+    parameters[:method] = "category.getList"
+
+    query_string = '?' + parameters.map { |k,v|
+      "%s=%s" % [URI.encode(k.to_s), URI.encode(v.to_s)]
+    }.join('&')
+
+    url = BASE_URL + query_string
+
+    xml = Fast.fetch(url)
+    doc = REXML::Document.new(xml)
+    doc.elements.each("/rsp/category") { |category|
+      categories << category
+    }
+    return categories 
   end
 
 end

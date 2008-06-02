@@ -19,11 +19,8 @@ class Yelp
 
     url = BASE_URL + query_string
 
-Camping::Models::Base.logger.debug(url)
-
-    open(url) { |json|
-      response = ActiveSupport::JSON.decode(json.readlines.join)
-      return businesses = response["businesses"]
-    }
+    json = Fast.fetch(url)
+    response = ActiveSupport::JSON.decode(json.readlines.join)
+    return businesses = response["businesses"]
   end
 end

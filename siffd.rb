@@ -22,19 +22,20 @@ require 'uuidtools'
 #require 'right_aws'
 require 'rexml/document'
 require 'hpricot'
+require 'memcache'
 
 #import into the system
 require 'camping'
-#require 'camping/fastcgi'
-require 'camping/session'
-#require 'acts_as_versioned'
+require 'camping/ar/session'
 require 'action_mailer'
 require 'tmail'
 require 'openid'
 require 'openid/store/filesystem'
 require 'openid/consumer'
 require 'openid/extensions/sreg'
+require 'markaby'
 
+require '/var/www/siffd/fast'
 require '/var/www/siffd/hostip'
 require '/var/www/siffd/forty_three_places'
 require '/var/www/siffd/upcoming'
@@ -43,59 +44,19 @@ require '/var/www/siffd/yelp'
 
 Camping.goes :Siffd
 
-=begin
-module SessionSupport
-  def self.included(base)
-    base.class_eval do
-      def self.include_session_support
-        true
-      end
-    end
-  end
-end
-=end
-
 module Siffd
-  include Camping::Session
+  include Camping::ARSession 
   @@state_secret = "wangchung!"
   @@state_timeout = 99999
-
-=begin
-  def service(*a)
-    session = Camping::Models::Session.persist(@cookies)
-    app = self.class.name.gsub(/^(\w+)::.+$/, '\1')
-    @state = (session[app] ||= Camping::H[])
-    hash_before = Marshal.dump(@state).hash
-    s = super(*a)
-    #if @method == "get" and @input.length == 0 and not @env['REQUEST_URI'].include?("dashboard") and not @env['REQUEST_URI'].include?("dangotalk") then
-    #  cache_directory = "/tmp/cache/risingcode.com/#{@env['REQUEST_URI']}"
-    #  File.makedirs(cache_directory)
-    #  cache_filename = "#{cache_directory}/index.html"
-    #  cache_file = File.new(cache_filename, "w")
-    #  #cache_file.write(s.body)
-    #  cache_file.close
-    #end
-    if session
-      hash_after = Marshal.dump(@state).hash
-      unless hash_before == hash_after
-          session[app] = @state
-          session.save
-      end
-    end
-    return self
-  end
-=end
 
   def authenticated
     @state.person_id
   end
 
   def nickname
-Camping::Models::Base.logger.debug("4")
     unless @person
       @person = Models::Person.find(@state.person_id)
     end
-Camping::Models::Base.logger.debug("5")
     @person[:nickname]
   end
 
@@ -124,7 +85,6 @@ Camping::Models::Base.logger.debug("5")
   def remote_location
     Hostip.geolocate(remote_addr)
   end
-
 end
 
 module Siffd::Models
@@ -132,6 +92,7 @@ module Siffd::Models
     def Base.table_name_prefix
     end
   end
+
   class CreateSessions < V(1)
     def self.up
       create_table :sessions, :force => true do |t|
@@ -140,6 +101,7 @@ module Siffd::Models
         t.column :ivars,       :text
       end
     end
+
     def self.down
       drop_table :sessions
     end
@@ -158,6 +120,7 @@ module Siffd::Models
         t.column :updated_at, :datetime, :null => false
       end
     end
+
     def self.down
       drop_table :people
     end
@@ -235,9 +198,9 @@ module Siffd::Controllers
   end
 
   class Index < R('/', '/(when)/(\d+)/(\d+)/(\d+)', '/(what)/(.*)', '/(where)/(.*)')
+    attr_accessor :needs_starting_points
     def get(*args)
       @popular_events, @popular_cities = Upcoming.popular
-      #@new_places = FortyThreePlaces.new_places 
       @new_places = [
         "Metropolitan Museum of Art",
         "Astrodome",
@@ -246,26 +209,40 @@ module Siffd::Controllers
         "Mile High Stadium",
         "The Louvre"
       ]
-
+     
+      @needs_starting_points = true
+      @determine_location_from_what = false
       @what = nil
       @when = nil
       @where = nil
       @location = nil
       @city_name = nil
       @state_name = nil
+
       @events = []
       @businesses = []
+      @categories = []
       @neighbors = []
+
+      @latitude = 50
+      @longitude = 50
 
       case args.shift
         when "when"
           @when = args.join("/")
+          @needs_starting_points = false 
 
         when "what"
           @what = args.join
+          @needs_starting_points = false 
+          @determine_location_from_what = true
 
         when "where"
+          @needs_starting_points = false 
           @where = args.join
+
+      else
+        @needs_starting_points = @input.length == 0
       end
 
       unless @where then
@@ -288,16 +265,29 @@ module Siffd::Controllers
         @what = @input.what
       end
 
+      @categories = Upcoming.categories
+
+      if @determine_location_from_what then
+        @starting_events = Upcoming.text_search(@what)
+        if @starting_events.length > 0 then
+          @where = (@starting_events[0].attributes["venue_city"] + "," + @starting_events[0].attributes["venue_state_name"])
+        end
+      end
+
       @woeids = Location.search(@where) unless @where.blank?
+
       if @woeids.length > 0 then
         centroid = @woeids[0].elements["centroid"]
-        latitude = centroid.elements["latitude"].text
-        longitude = centroid.elements["longitude"].text
-        @location  = "#{latitude},#{longitude}"
+        @latitude = centroid.elements["latitude"].text
+        @longitude = centroid.elements["longitude"].text
+        @location  = "#{@latitude},#{@longitude}"
         @woeid = @woeids[0].elements["woeid"].text
         @city_name = @woeids[0].elements["admin2"].text
         @state_name = @woeids[0].elements["admin1"].text
-        @businesses = Yelp.business_review_search_geo(latitude, longitude, @what)
+        @businesses = Yelp.business_review_search_geo(@latitude, @longitude, @what)
+        if @businesses.length == 0 then
+          @businesses = Yelp.business_review_search_geo(@latitude, @longitude, "")
+        end
         @neighbors = Location.neighbors(@woeid)
       else
         @metros = Upcoming.metro_search(@where)
@@ -307,11 +297,9 @@ module Siffd::Controllers
           @location = "#{city},#{state}"
         end 
       end
-
+      
       @events = Upcoming.text_search(@what, @location)
     
-      #@what = "Everything" if @what.blank?
-
       render :index
     end
     def post (*args)
@@ -336,6 +324,7 @@ module Siffd::Views
         }
         link(:rel => "stylesheet", :type => "text/css", :href => "/stylesheets/calendar.css")
         link(:rel => "stylesheet", :type => "text/css", :href => "/stylesheets/main.css")
+        script(:src => "http://maps.google.com/maps?file=api&v=2&key=ABQIAAAAiCfmCUYBXSBcgN089m8uMRRBklo7BkJF1s7INZxbohood2cCExRys7Q0NHSqMrpvojvgmmUX02y-PA", :type => "text/javascript")
         script(:src => "/javascripts/prototype.js", :type => "text/javascript")
         script(:src => "/javascripts/scriptaculous.js", :type => "text/javascript")
         script(:src => "/javascripts/prototype.js", :type => "text/javascript")
@@ -344,55 +333,57 @@ module Siffd::Views
         meta(:name => "viewport", :content => "width=850")
       }
       body {
-        if authenticated then
-          ul.login! {
-            li {
-              text("Logged&nbsp;in&nbsp;as:&nbsp;")
-              nickname
-            }
-          }
-        else
-          form(:action => R(Login, nil), :method => :post) {
+        div.content! {
+          if authenticated then
             ul.login! {
               li {
-                input.identity_url!(:name => :identity_url)
+                text("Logged&nbsp;in&nbsp;as:&nbsp;")
+                nickname
+              }
+            }
+          else
+            form(:action => R(Login, nil), :method => :post) {
+              ul.login! {
+                li {
+                  input.identity_url!(:name => :identity_url)
+                }
+                li {
+                  input(:type => :submit, :value => "login")
+                }
+              }
+            }
+          end
+          form(:action => R(Index), :method => :post) {
+            input(:type => :hidden, :id => :latitude, :name => :latitude, :value => @latitude)
+            input(:type => :hidden, :id => :longitude, :name => :longitude, :value => @longitude)
+            ul.dates! {
+              li {
+                img.calendar!(:src => "/images/calendar.png", :alt => "select date")
               }
               li {
-                input(:type => :submit, :value => "login")
+                input.when!(:name => :when, :value => @when)
+              }
+              li {
+                a(:href => R(Index, "when", *today.slugify)) {
+                  "today"
+                }
+              }
+              li {
+                a(:href => R(Index, "when", *tomorrow.slugify)) {
+                  "tomorrow"
+                }
+              }
+              li {
+                a(:href => R(Index, "when", *this_friday.slugify)) {
+                  "this friday"
+                }
+              }
+              li {
+                a(:href => R(Index, "when", *next_friday.slugify)) {
+                  "next friday"
+                }
               }
             }
-          }
-        end
-        form(:action => R(Index), :method => :post) {
-          ul.dates! {
-            li {
-              img.calendar!(:src => "/images/calendar.png", :alt => "select date")
-            }
-            li {
-              input.when!(:name => :when, :value => @when)
-            }
-            li {
-              a(:href => R(Index, "when", *today.slugify)) {
-                "today"
-              }
-            }
-            li {
-              a(:href => R(Index, "when", *tomorrow.slugify)) {
-                "tomorrow"
-              }
-            }
-            li {
-              a(:href => R(Index, "when", *this_friday.slugify)) {
-                "this friday"
-              }
-            }
-            li {
-              a(:href => R(Index, "when", *next_friday.slugify)) {
-                "next friday"
-              }
-            }
-          }
-          div {
             self << yield
           }
         }
@@ -402,81 +393,138 @@ module Siffd::Views
 
   def index
     div {
-      ul.popular_cities! {
-        @popular_cities.each { |city|
-          li {
-            a(:href => R(Index, "where", city)) {
-              city
+      if @needs_starting_points then
+        div.starting_points! {
+          ul.popular_cities! {
+            @popular_cities.each { |city|
+              li {
+                a(:href => R(Index, "where", city)) {
+                  city
+                }
+              }
             }
           }
-        }
-      }
-      ul.popular_events! {
-        @popular_events.each { |event|
-          li {
-            a(:href => R(Index, "what", event)) {
-              event
+          ul.popular_events! {
+            @popular_events.each { |event|
+              li {
+                a(:href => R(Index, "what", event)) {
+                  event
+                }
+              }
             }
           }
-        }
-      }
-      ul.new_places! {
-        @new_places.each { |place|
-          li {
-            a(:href => R(Index, "where", place)) {
-              place
+          ul.new_places! {
+            @new_places.each { |place|
+              li {
+                a(:href => R(Index, "where", place)) {
+                  place
+                }
+              }
             }
           }
+          div.search! {
+            input(:name => :what, :value => @what)
+            text("&nbsp;near&nbsp;")
+            input(:name => :where, :value => @where)
+            text("&nbsp;")
+            input(:type => :submit, :value => "siffd")
+          }
         }
-      }
-      div.search! {
-        input(:name => :what, :value => @what)
-        text("&nbsp;near&nbsp;")
-        input(:name => :where, :value => @where)
-        text("&nbsp;")
-        input(:type => :submit, :value => "siffd")
-      }
-      div.results! {
+      else
         h1 {
-          if (@what) then
-            text(@what)
-          else
+          if @what.blank? then
             text("Everything")
+          else
+            text(@what)
           end
           text("&nbsp;near&nbsp;")
           text(@city_name)
           text(",&nbsp;")
           text(@state_name)
         } if (@city_name and @state_name)
-        ul.events! {
-          @events.each { |event|
+        div.results! {
+          div.map! {
+          }
+          ul.focusers! {
             li {
-              a(:href => R(Index, "what", event.attributes["name"])) {
-                event.attributes["name"]
+              a.focus_events!(:href => "#") {
+                "events"
+              }
+            }
+            li {
+              a.focus_businesses!(:href => "#") {
+                "business"
+              }
+            }
+            li {
+              a.focus_neighbors!(:href => "#") {
+                "neighbors"
               }
             }
           }
-        }
-        ul.businesses! {
-          @businesses.each { |business|
-            li {
-              img(:src => business["photo_url"]) unless business["photo_url"].blank?
-              a(:href => R(Index, "what", business["name"])) {
-                text(business["name"])
+          ul.events! {
+            @events.each { |event|
+              li.event(:id => event.attributes["id"]) {
+                span.name {
+                  a(:href => R(Index, "what", event.attributes["name"])) {
+                    event.attributes["name"]
+                  }
+                }
+                span.description {
+                  event.attributes["description"]
+                }
+                span.geo {
+                  span.latitude {
+                    event.attributes["latitude"]
+                  }
+                  span.longitude {
+                    event.attributes["longitude"]
+                  }
+                }
               }
             }
           }
-        }
-        ul.neighbors! {
-          @neighbors.each { |neighbor|
-            li {
-              a(:href => R(Index, "where", neighbor.elements["name"].text)) {
-                text(neighbor.elements["name"].text)
+          ul.businesses! {
+            @businesses.each { |business|
+              li.business(:id => business["id"]) {
+                img(:src => business["photo_url"]) unless business["photo_url"].blank?
+                span.name {
+                  a(:href => R(Index, "what", business["name"])) {
+                    text(business["name"])
+                  }
+                }
+                span.geo {
+                  span.latitude {
+                    business["latitude"]
+                  }
+                  span.longitude {
+                    business["longitude"]
+                  }
+                }
               }
             }
           }
+          ul.neighbors! {
+            @neighbors.each { |neighbor|
+              li {
+                a(:href => R(Index, "where", neighbor.elements["name"].text)) {
+                  text(neighbor.elements["name"].text)
+                }
+              }
+            }
+          }
+=begin
+          ul.categories! {
+            @categories.each { |category|
+              li {
+                input(:type => :checkbox, :name => "categories[]", :value => category.attributes["id"])
+                text(category.attributes["name"])
+              }
+            }
+          }
+=end
         }
-      }
+      end
     }
   end
 

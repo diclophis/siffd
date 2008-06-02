@@ -7,12 +7,10 @@ class Location
   def self.search (query)
     places = []
     url = BASE_URL + "places.q('" + URI.encode(query) + "')"
-Camping::Models::Base.logger.debug(url)
-    open(url) { |xml|
-      doc = REXML::Document.new(xml)
-      doc.elements.each("/places/place") { |place|
-        places << place
-      }
+    xml = Fast.fetch(url)
+    doc = REXML::Document.new(xml)
+    doc.elements.each("/places/place") { |place|
+      places << place
     }
     return places
   end
@@ -21,13 +19,10 @@ Camping::Models::Base.logger.debug(url)
     places = []
     url = BASE_URL + "place/#{woeid}/neighbors"
 
-Camping::Models::Base.logger.debug(url)
-
-    open(url) { |xml|
-      doc = REXML::Document.new(xml)
-      doc.elements.each("/places/place") { |place|
-        places << place
-      }
+    xml = Fast.fetch(url)
+    doc = REXML::Document.new(xml)
+    doc.elements.each("/places/place") { |place|
+      places << place unless place.elements["name"].text.to_i.to_s == place.elements["name"].text
     }
     return places
   end

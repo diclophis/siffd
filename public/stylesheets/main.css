@@ -3,10 +3,7 @@
 body {
   margin: 0;
   padding: 0;
-}
-
-img {
-  border: 0px;
+  font-size: 100%;
 }
 
 ul {
@@ -15,15 +12,26 @@ ul {
   padding: 0;
 }
 
-a, p, li, h1 {
+img, a, p, li, h1 {
+  border: 0;
   margin: 0;
   padding: 0;
 }
 
+h1 {
+  clear: both;
+  font-size: x-large;
+  margin: 0em 0 0.5em 0;
+}
+
+#content {
+  width: 960px;
+  margin: 0.5em;
+  float: left;
+}
+
 #login {
-  position: absolute;
-  top: 0.5em;
-  left: 0.5em;
+  float: left;
 }
 
 #login li {
@@ -39,9 +47,7 @@ input#identity_url {
 }
 
 #dates {
-  position: absolute;
-  top: 0.5em;
-  right: 0.5em;
+  float: right;
 }
 
 #dates li {
@@ -50,47 +56,48 @@ input#identity_url {
 }
 
 input#when {
-  border: 0px;
   width: 6em;
 }
 
 #dates img {
-  margin: 0 0 5px 0;
-  padding: 0;
-  vertical-align: middle;
+  vertical-align: top;
+}
+
+#starting_points {
+  float: left;
+  width: 960px;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
 }
 
 #popular_cities {
-  position: absolute;
-  top: 4em;
-  left: 4%;
-  width: 25%;
+  clear: left;
+  float: left;
+  width: 30%;
   height: 10em;
   overflow: hidden;
+  margin: 0.5em;
 }
 
 #popular_events {
-  position: absolute;
-  top: 4em;
-  left: 37%;
-  width: 25%;
+  float: left;
+  width: 34%;
   height: 10em;
   overflow: hidden;
+  margin: 0.5em;
 }
 
 #new_places {
-  position: absolute;
-  top: 4em;
-  left: 70%;
-  width: 25%;
+  float: left;
+  width: 30%;
   height: 10em;
   overflow: hidden;
+  margin: 0.5em;
 }
 
 #search {
-  position: absolute;
-  top: 15em;
-  width: 100%;
+  float: left;
+  width: 960px;
   text-align: center;
   margin: 0;
   padding: 0;
@@ -104,26 +111,31 @@ input#when {
 }
 
 #results {
-  position: absolute;
-  top: 20em;
-  margin: 0.5em;
-  width: 99%;
+  width: 593px;
+  margin-left: 367px;
+}
+
+#map {
+  width: 100%;
+  height: 20em;
+  border: 1px solid black;
+}
+
+#focusers {
+  clear: both;
+}
+
+#focusers li {
+  float: left;
+  margin: 0 0.25em 0 0;
 }
 
 #events {
-  position: absolute;
-  top: 4em;
-  left: 4%;
-  width: 30%;
-  height: 10em;
+  clear: both;
 }
 
 #businesses {
-  position: absolute;
-  top: 4em;
-  left: 40%;
-  width: 30%;
-  height: 10em;
+  clear: both;
 }
 
 #businesses li {
@@ -136,10 +148,13 @@ input#when {
 }
 
 #neighbors {
-  position: absolute;
-  top: 4em;
-  left: 75%;
-  width: 25%;
-  height: 10em;
+  clear: both;
 }
 
+span.description {
+  display: none;
+}
+
+span.geo {
+  display: none;
+}
