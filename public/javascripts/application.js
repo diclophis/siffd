@@ -45,6 +45,7 @@ Event.observe(window, "load", function () {
       map.addOverlay(marker);
     }
   });
+
   $$(".business").each(function(an_event) {
     id = an_event.id;
     geo = an_event.select(".geo").first();
@@ -61,6 +62,7 @@ Event.observe(window, "load", function () {
       map.addOverlay(marker);
     }
   });
+
   $$("#focusers a").each(function(focuser) {
     Event.observe(focuser, "click", function(click) {
       Event.stop(click);
@@ -72,4 +74,18 @@ Event.observe(window, "load", function () {
     });
     $(focuser.id.replace("focus_", "")).hide();
   });
+
+  $$("#todo").each(function(todo) {
+    Sortable.create("things", {
+      dropOnEmpty : true,
+      containment : ["things", "businesses", "events"]
+    });
+    Sortable.create("businesses", {
+      constraint : null
+    });
+    Sortable.create("events", {
+      constraint : null
+    });
+  });
+
 });

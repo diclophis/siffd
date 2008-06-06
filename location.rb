@@ -6,7 +6,7 @@ class Location
 
   def self.search (query)
     places = []
-    url = BASE_URL + "places.q('" + URI.encode(query) + "')"
+    url = BASE_URL + "places.q('" + URI.encode(query) + "')?appid=" + APP_ID 
     xml = Fast.fetch(url)
     doc = REXML::Document.new(xml)
     doc.elements.each("/places/place") { |place|
@@ -17,7 +17,7 @@ class Location
 
   def self.neighbors (woeid)
     places = []
-    url = BASE_URL + "place/#{woeid}/neighbors"
+    url = BASE_URL + "place/#{woeid}/neighbors?appid=" + APP_ID
 
     xml = Fast.fetch(url)
     doc = REXML::Document.new(xml)

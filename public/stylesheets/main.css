@@ -22,6 +22,7 @@ h1 {
   clear: both;
   font-size: x-large;
   margin: 0em 0 0.5em 0;
+  padding: 0.5em 0 0 0;
 }
 
 #content {
@@ -56,6 +57,7 @@ input#identity_url {
 }
 
 input#when {
+  border: 0px;
   width: 6em;
 }
 
@@ -121,8 +123,20 @@ input#when {
   border: 1px solid black;
 }
 
+#todo {
+  float: left;
+  width: 360px;
+  border: 1px solid yellow;
+}
+
+#things {
+  border: 1px solid green;
+  padding: 0.25em 0.25em 1em 0.5em;
+}
+
 #focusers {
-  clear: both;
+  clear: none;
+  float: right;
 }
 
 #focusers li {
@@ -131,24 +145,27 @@ input#when {
 }
 
 #events {
-  clear: both;
+  clear: none;
+  padding: 0.5em;
 }
 
 #businesses {
-  clear: both;
-}
-
-#businesses li {
-  margin: 0 0 0.25em 0;
-}
-
-#businesses img {
-  vertical-align: middle;
-  margin: 0 0.25em 0 0;
+  clear: none;
+  padding: 0.5em;
 }
 
 #neighbors {
-  clear: both;
+  clear: none;
+  padding: 0.5em;
+}
+
+#things li, #businesses li {
+  margin: 0 0 0.25em 0;
+}
+
+#things img, #businesses img {
+  vertical-align: middle;
+  margin: 0 0.25em 0 0;
 }
 
 span.description {

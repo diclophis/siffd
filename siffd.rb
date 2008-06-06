@@ -27,8 +27,8 @@ require 'memcache'
 #import into the system
 require 'camping'
 require 'camping/ar/session'
-require 'action_mailer'
-require 'tmail'
+#require 'action_mailer'
+#require 'tmail'
 require 'openid'
 require 'openid/store/filesystem'
 require 'openid/consumer'
@@ -297,7 +297,18 @@ module Siffd::Controllers
           @location = "#{city},#{state}"
         end 
       end
-      
+
+@business_categories = []
+@businesses.each { |business|
+#Camping::Models::Base.logger.debug(business["categories"])
+#Camping::Models::Base.logger.debug("\n\n")
+  business["categories"].each { |category|
+    @business_categories << category["name"]
+  }
+}
+#Camping::Models::Base.logger.debug(@business_categories.uniq)
+
+     
       @events = Upcoming.text_search(@what, @location)
     
       render :index
@@ -442,6 +453,13 @@ module Siffd::Views
           text(",&nbsp;")
           text(@state_name)
         } if (@city_name and @state_name)
+        div.todo! {
+          ul.things! {
+            #li.first_thing! {
+            #  text("Drag Things Here")
+            #}
+          }
+        }
         div.results! {
           div.map! {
           }
@@ -466,9 +484,9 @@ module Siffd::Views
             @events.each { |event|
               li.event(:id => event.attributes["id"]) {
                 span.name {
-                  a(:href => R(Index, "what", event.attributes["name"])) {
+                  #a(:href => R(Index, "what", event.attributes["name"])) {
                     event.attributes["name"]
-                  }
+                  #}
                 }
                 span.description {
                   event.attributes["description"]
@@ -489,9 +507,9 @@ module Siffd::Views
               li.business(:id => business["id"]) {
                 img(:src => business["photo_url"]) unless business["photo_url"].blank?
                 span.name {
-                  a(:href => R(Index, "what", business["name"])) {
+                  #a(:href => R(Index, "what", business["name"])) {
                     text(business["name"])
-                  }
+                  #}
                 }
                 span.geo {
                   span.latitude {
