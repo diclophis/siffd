@@ -42,13 +42,15 @@ class Upcoming
     return metros 
   end
 
-  def self.text_search (search_text, location = nil)
+  def self.text_search (location, search_text = nil)
+    raise ":location required" if location.blank?
+
     events = []
     parameters = {}
     parameters[:api_key] = API_KEY
     parameters[:method] = "event.search"
+    parameters[:location] = location
     parameters[:search_text] = search_text unless search_text.blank?
-    parameters[:location] = location if location
 
     query_string = '?' + parameters.map { |k,v|
       "%s=%s" % [URI.encode(k.to_s), URI.encode(v.to_s)]

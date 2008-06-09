@@ -227,8 +227,11 @@ module Siffd::Controllers
       @specific_businesses = []
       @all_businesses = []
 
-      @business_categories = []
-      @event_categories = []
+      @all_business_categories = []
+      @all_event_categories = []
+
+      @specific_business_categories = []
+      @specific_event_categories = []
 
       @neighbors = []
 
@@ -266,24 +269,11 @@ module Siffd::Controllers
         end
       end
 
-      #unless @when then
-      #  if @input.when.blank? then
-      #  else
-      #    @when = Date.parse(@input.when).slugify.join("/")
-      #  end
-      #end
+      if @where.blank? then
+        @needs_starting_points = true
+      else
 
-      @event_categories = Upcoming.categories
-      @business_categories = Yelp.categories
-
-      #if @determine_location_from_what then
-      #  @starting_events = Upcoming.text_search(@what)
-      #  if @starting_events.length > 0 then
-      #    @where = (@starting_events[0].attributes["venue_city"] + "," + @starting_events[0].attributes["venue_state_name"])
-      #  end
-      #end
-
-      @woeids = Location.search(@where) unless @where.blank?
+      @woeids = Location.search(@where)
 
       if @woeids.length > 0 then
         centroid = @woeids[0].elements["centroid"]
@@ -293,32 +283,27 @@ module Siffd::Controllers
         @woeid = @woeids[0].elements["woeid"].text
         @city_name = @woeids[0].elements["admin2"].text
         @state_name = @woeids[0].elements["admin1"].text
-        @businesses = Yelp.business_review_search_geo(@latitude, @longitude, @what)
-        if @businesses.length == 0 then
-          @businesses = Yelp.business_review_search_geo(@latitude, @longitude, "")
-        end
-        @neighbors = Location.neighbors(@woeid)
       else
-        @metros = Upcoming.metro_search(@where)
-        if @metros.length > 0 then
-          @city_name = @metros[0].attributes["name"]
-          @state_name = @metros[0].attributes["state_name"]
-          @location = "#{city},#{state}"
-        end 
+        raise "Unknown :where"
       end
 
-@business_categories = []
-@businesses.each { |business|
-#Camping::Models::Base.logger.debug(business["categories"])
-#Camping::Models::Base.logger.debug("\n\n")
-  business["categories"].each { |category|
-    @business_categories << category["name"]
-  }
-}
-#Camping::Models::Base.logger.debug(@business_categories.uniq)
+      @neighbors = Location.neighbors(@woeid)
 
-     
-      @events = Upcoming.text_search(@what, @location)
+      @specific_businesses = Yelp.business_review_search_geo(@latitude, @longitude, @what)
+      @all_businesses = Yelp.business_review_search_geo(@latitude, @longitude, "")
+
+      @specific_events = Upcoming.text_search(@location, @what)
+      @all_events = Upcoming.text_search(@location)
+
+      @all_event_categories = Upcoming.categories
+      @all_business_categories = Yelp.categories
+
+      @businesses.each { |business|
+        business["categories"].each { |category|
+          @specific_business_categories << category["name"]
+        }
+      }
+#Camping::Models::Base.logger.debug(@business_categories.uniq)
     
       render :index
     end
