@@ -197,7 +197,7 @@ module Siffd::Controllers
     end
   end
 
-  class Index < R('/', '/(when)/(\d+)/(\d+)/(\d+)', '/(what)/(.*)', '/(where)/(.*)')
+  class Index < R('/', '/(.*)')
     attr_accessor :needs_starting_points
     def get(*args)
       @popular_events, @popular_cities = Upcoming.popular
@@ -212,21 +212,29 @@ module Siffd::Controllers
      
       @needs_starting_points = true
       @determine_location_from_what = false
+
       @what = nil
       @when = nil
       @where = nil
+
       @location = nil
       @city_name = nil
       @state_name = nil
 
-      @events = []
-      @businesses = []
-      @categories = []
+      @specific_events = []
+      @all_events = []
+
+      @specific_businesses = []
+      @all_businesses = []
+
+      @business_categories = []
+      @event_categories = []
+
       @neighbors = []
 
       @latitude = 50
       @longitude = 50
-
+=begin
       case args.shift
         when "when"
           @when = args.join("/")
@@ -244,6 +252,11 @@ module Siffd::Controllers
       else
         @needs_starting_points = @input.length == 0
       end
+=end
+
+      @where = args.first
+      @when = today.slugify.join("/")
+      @what = @input.what
 
       unless @where then
         if @input.where.blank? then
@@ -253,26 +266,22 @@ module Siffd::Controllers
         end
       end
 
-      unless @when then
-        if @input.when.blank? then
-          @when = today.slugify.join("/")
-        else
-          @when = Date.parse(@input.when).slugify.join("/")
-        end
-      end
+      #unless @when then
+      #  if @input.when.blank? then
+      #  else
+      #    @when = Date.parse(@input.when).slugify.join("/")
+      #  end
+      #end
 
-      unless @what then
-        @what = @input.what
-      end
+      @event_categories = Upcoming.categories
+      @business_categories = Yelp.categories
 
-      @categories = Upcoming.categories
-
-      if @determine_location_from_what then
-        @starting_events = Upcoming.text_search(@what)
-        if @starting_events.length > 0 then
-          @where = (@starting_events[0].attributes["venue_city"] + "," + @starting_events[0].attributes["venue_state_name"])
-        end
-      end
+      #if @determine_location_from_what then
+      #  @starting_events = Upcoming.text_search(@what)
+      #  if @starting_events.length > 0 then
+      #    @where = (@starting_events[0].attributes["venue_city"] + "," + @starting_events[0].attributes["venue_state_name"])
+      #  end
+      #end
 
       @woeids = Location.search(@where) unless @where.blank?
 
@@ -439,6 +448,13 @@ module Siffd::Views
             input(:name => :where, :value => @where)
             text("&nbsp;")
             input(:type => :submit, :value => "siffd")
+            ul.categories! {
+              @categories.each { |category|
+                li {
+                  category.inspect
+                }
+              }
+            }
           }
         }
       else

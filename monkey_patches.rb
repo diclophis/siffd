@@ -31,3 +31,11 @@ class Date
   end
 end
 
+class String
+  def codify
+    parts = self.split("(")
+    name = parts[0].strip
+    code = parts[1].gsub(")", "").strip
+    {:name => name, :code => code}
+  end
+end
